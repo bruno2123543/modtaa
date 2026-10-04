@@ -1,0 +1,32 @@
+name: build-dxgi-dll
+
+on:
+  workflow_dispatch: # Permite acionar o workflow manualmente pelo botão "Run workflow"
+  push:
+    branches: [ "main" ] # Opcional: executa automaticamente ao fazer push para a branch main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # 1. Descarrega o código do repositório
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2. Configura as ferramentas do Visual Studio (MSBuild e ferramentas de C++)
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      # 3. Compila a DLL em modo Release (Ajuste o caminho da sua solução .sln)
+      - name: Build DXGI DLL
+        run: msbuild /p:Configuration=Release /p:Platform=x64
+
+      # 4. Guarda a DLL gerada como um artefacto para poder fazer o download no final
+      - name: Upload DXGI DLL artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dxgi-dll-release
+          path: |
+            **/Release/*.dll
+            **/x64/Release/*.dll
